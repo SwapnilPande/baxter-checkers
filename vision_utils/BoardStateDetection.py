@@ -4,6 +4,8 @@ import numpy as np
 # findCorners
 # Given an image of a checkerboard, this function will return the location of all of the corners
 # of the squares of the checkerboard
+# NOTE: This function can only be used when the checkerboard does not have pieces on it
+# Used for calibrating the position of the checkerboard in the camera frame
 # img - numpy array containing the image of the checkerboard
 # returns (9,9,2) numpy array containing the (x,y) coordinates of the checkerboard
 def findCorners(img):
@@ -94,16 +96,15 @@ def findPieces(image, corners):
 
 # getBoardState
 # Returns the position of all the pieces on the checkers board
-# Uses findCorners to locate vertices on the board, findCenters to find the centers of each of the square,
-# and findPieces to determine what piece is in each square
+# Uses findPieces to determine the position of each piece on the board given corners of the squares and new image
 # Returns: 2d numpy array of game state
 # -1 - No piece present
 #  0 - Black regular piece
 #  1 - Red regular piece
 #  2 - Black king
 #  3 - Red king
-def getBoardState(image):
-    corners = findCorners(image)
+def getBoardState(image, corners):
+
     centers = findCenters(corners)
 
     return findPieces(image, corners)

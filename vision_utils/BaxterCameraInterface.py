@@ -43,11 +43,13 @@ def captureImage():
 
     #TODO Implement waiting until the desired joint angle is reached
 
+    # Capture a single image from the Baxter left arm
     rosImage = rospy.wait_for_message(LEFT_ARM_CAMERA_TOPIC, Image, timeout=None)
 
     try:
         bridge = CvBridge()
-        image = np.asarray(bridge.imgmsg_to_cv2(data, "bgr8"))
+        # Convert to cv::Mat and then cast to numpy array
+        image = np.asarray(bridge.imgmsg_to_cv2(rosImage, "bgr8"))
     except CvBridgeError as e:
         print(e)
 
