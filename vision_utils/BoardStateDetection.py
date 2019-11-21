@@ -71,7 +71,7 @@ def findCenters(corners):
     for i in range(corners.shape[0] - 1):
         for j in range(corners.shape[1] - 1):
             # Checkerboard corners form parallelograms for each square
-            # Diagonals of parallelgrams bisect at the center of mass
+            # Diagonals of parallelograms bisect at the center of mass
             # Therefore, we can find the center of two opposing corners to find the centers of the squares
             firstCorner = np.array(corners[i][j])
             secondCorner = np.array(corners[i+1][j+1])
@@ -80,93 +80,58 @@ def findCenters(corners):
 
     return centers
 
+# findPieces
+# Given an image of a checker board and the location of the center of the squares, this function will determine what color piece is at each square
+# The function assumes that the pieces are only on black squares of the board and that the color of the pieces are known prior to running the program
+# Returns: 2d numpy array of game state
+# -1 - No piece present
+#  0 - Black regular piece
+#  1 - Red regular piece
+#  2 - Black king
+#  3 - Red king
+def findPieces(image, corners):
+    return np.zeros(shape = (8,8))
 
-def findPieces(image):
-    # Find the difference between the two images
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# getBoardState
+# Returns the position of all the pieces on the checkers board
+# Uses findCorners to locate vertices on the board, findCenters to find the centers of each of the square,
+# and findPieces to determine what piece is in each square
+# Returns: 2d numpy array of game state
+# -1 - No piece present
+#  0 - Black regular piece
+#  1 - Red regular piece
+#  2 - Black king
+#  3 - Red king
+def getBoardState(image):
+    corners = findCorners(image)
+    centers = findCenters(corners)
 
-    # Set our filtering parameters
-    # Initialize parameter settiing using cv2.SimpleBlobDetector
-    params = cv2.SimpleBlobDetector_Params()
-
-    # # Set Area filtering parameters
-    # params.filterByArea = True
-    # params.minArea = 100
-
-    # # Set Circularity filtering parameters
-    # params.filterByCircularity = True
-    # params.minCircularity = 0.9
-
-    # # Set Convexity filtering parameters
-    # # params.filterByConvexity = True
-    # # params.minConvexity = 0.2
-
-    # # Set inertia filtering parameters
-    # params.filterByInertia = True
-    # params.minInertiaRatio = 0.01
-
-    # Create a detector with the parameters
-    detector = cv2.SimpleBlobDetector_create(params)
-
-    # Detect blobs
-    keypoints = detector.detect(image)
-
-    # Draw blobs on our image as red circles
-    blank = np.zeros((1, 1))
-    blobs = cv2.drawKeypoints(image, keypoints, blank, (0, 0, 255),
-                            cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-    number_of_blobs = len(keypoints)
-    text = "Number of Circular Blobs: " + str(len(keypoints))
-    cv2.putText(blobs, text, (20, 550),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2)
-
-    # Show blobs
-    cv2.imshow("Filtering Circular Blobs Only", blobs)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    return findPieces(image, corners)
 
 
 
 
 
 
+if __name__ == "__main__":
+    # Load image from file
+    img = cv2.imread("test4.jpg")
 
-    # # ensure at least some circles were found
-    # if circles is not None:
-    #     # convert the (x, y) coordinates and radius of the circles to integers
-    #     circles = np.round(circles[0, :]).astype("int")
+    imgWithPieces = cv2.imread("test4.jpg")
 
-    #     # loop over the (x, y) coordinates and radius of the circles
-    #     for (x, y, r) in circles:
-    #         # draw the circle in the output image, then draw a rectangle
-    #         # corresponding to the center of the circle
-    #         cv2.circle(output, (x, y), r, (0, 255, 0), 4)
-    #         cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+    #findPieces(imgWithPieces)
 
-    # show the output image
+    corners = findCorners(img)
 
+    # Once we have found all the corners of the checkerboard, we need to find the center of mass of the squares
+    centers = findCenters(corners)
 
+    color = (255,0,0)
 
+    for center in np.reshape(centers, (64,2)):
+        cv2.circle(img, (int(center[0]), int(center[1])), radius = 5, color = color)
 
-# Load image from file
-img = cv2.imread("test4.jpg")
-
-imgWithPieces = cv2.imread("test4.jpg")
-
-#findPieces(imgWithPieces)
-
-corners = findCorners(img)
-
-# Once we have found all the corners of the checkerboard, we need to find the center of mass of the squares
-centers = findCenters(corners)
-
-color = (255,0,0)
-
-for center in np.reshape(centers, (64,2)):
-    cv2.circle(img, (int(center[0]), int(center[1])), radius = 5, color = color)
-
-cv2.imshow("test",img)
-cv2.waitKey(20000)
+    cv2.imshow("test",img)
+    cv2.waitKey(20000)
 
 
